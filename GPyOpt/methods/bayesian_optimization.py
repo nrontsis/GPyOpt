@@ -171,7 +171,7 @@ class BayesianOptimization(BO):
         else: self.objective_name = 'no_name'
         self.batch_size = batch_size
         self.num_cores = num_cores
-        self.objective = SingleObjective(self.f, self.batch_size, self.num_cores,self.objective_name)
+        self.objective = SingleObjective(self.f, self.num_cores, self.objective_name)
 
         # --- CHOOSE the cost model
         self.cost = CostModel(cost_withGradients)
@@ -208,7 +208,11 @@ class BayesianOptimization(BO):
 
         # --- CHOOSE the acquisition optimizer_type
         self.acquisition_optimizer_type = acquisition_optimizer_type
-        self.acquisition_optimizer = AcquisitionOptimizer(self.space, self.acquisition_optimizer_type, current_X = self.X)  ## more arguments may come here
+        if 'acquisition_optimizer' in self.kwargs:
+            self.acquisition_optimizer = kwargs['acquisition_optimizer']
+            print('Using an acquisition optimizer defined by the user.')
+        else:
+            self.acquisition_optimizer = AcquisitionOptimizer(self.space, self.acquisition_optimizer_type, current_X = self.X)  ## more arguments may come here
 
         # --- CHOOSE acquisition function. If an instance of an acquisition is passed (possibly user defined), it is used.
         self.acquisition_type = acquisition_type
