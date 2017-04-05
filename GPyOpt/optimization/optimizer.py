@@ -1,5 +1,6 @@
 # Copyright (c) 2016, the GPyOpt Authors
 # Licensed under the BSD 3-clause license (see LICENSE.txt)
+# import pdb
 
 def select_optimizer(name):
     """
@@ -62,6 +63,47 @@ class Opt_lbfgs(Optimizer):
             res = scipy.optimize.fmin_l_bfgs_b(f, x0=x0, bounds=self.space.get_bounds(),approx_grad=True, maxiter=self.maxiter)
         else:
             res = scipy.optimize.fmin_l_bfgs_b(_f_df, x0=x0, bounds=self.space.get_bounds(), maxiter=self.maxiter)
+        ###################
+        ## DERIVATIVE CHECK
+        ###################
+        # def random_sample(bounds):
+            # # k: Number of points
+            # n = bounds.shape[0]  # Dimensionality of each point
+            # X = np.random.rand(n)  # Sample uniformly between [0, 1]
+
+            # mean = np.sum(bounds, 1)/2
+            # length = bounds[:, 1] - bounds[:, 0]
+            # X = X - 1/2  # Centre to zero
+            # X = X*length  # Scale
+            # X = X + mean  # Centre to mean
+
+            # return X
+
+        # N = 1000
+        # der_num_lib = np.zeros((N, 2))
+        # der_an = np.zeros((N, 2))
+        # x_tests = []
+
+        # for i in range(N):
+            # x = random_sample(np.asarray(self.space.get_bounds()))
+            # x_tests.append(x)
+
+            # df = nd.Gradient(f)
+            # der_num_lib[i] = df(x)
+            # der_an[i] = f_df(x)[1][0]
+
+        # error = np.linalg.norm((der_an - der_num_lib)/der_an, axis=1)
+        # for i in range(N):
+            # if error[i] > 0.01:
+                # print('Analytical derivative:', der_an[i])
+                # print('Numerical derivative:', der_num_lib[i])
+                # print('Location x:', x_tests[i])
+                # pdb.set_trace()
+
+        # That's when lbfgs fails
+        # if d['warnflag'] is not 0:
+        #     pdb.set_trace()
+
         return np.atleast_2d(res[0]),np.atleast_2d(res[1])
 
 
