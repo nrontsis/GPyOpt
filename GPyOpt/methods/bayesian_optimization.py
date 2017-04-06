@@ -200,7 +200,7 @@ class BayesianOptimization(BO):
             if isinstance(kwargs['model'], GPyOpt.models.base.BOModel):
                 self.model = kwargs['model']
                 self.model_type = 'User defined model used.'
-                print('Using a model defined by the used.')
+                # print('Using a model defined by the used.')
             else:
                 self.model = self._model_chooser()
         else:
@@ -210,7 +210,7 @@ class BayesianOptimization(BO):
         self.acquisition_optimizer_type = acquisition_optimizer_type
         if 'acquisition_optimizer' in self.kwargs:
             self.acquisition_optimizer = kwargs['acquisition_optimizer']
-            print('Using an acquisition optimizer defined by the user.')
+            # print('Using an acquisition optimizer defined by the user.')
         else:
             self.acquisition_optimizer = AcquisitionOptimizer(self.space, self.acquisition_optimizer_type, current_X = self.X)  ## more arguments may come here
 
