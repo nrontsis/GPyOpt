@@ -85,7 +85,7 @@ class GPModel(BOModel):
         # --- update the model maximizing the marginal likelihood.
         if self.optimize_restarts==1:
             self.model.optimize(optimizer=self.optimizer, max_iters = self.max_iters, verbose=self.verbose)
-        else:
+        elif self.optimize_restarts > 0:
             self.model.optimize_restarts(num_restarts=self.optimize_restarts, optimizer=self.optimizer, max_iters = self.max_iters, verbose=self.verbose)
 
     def predict(self, X):
@@ -329,4 +329,3 @@ class GPModel_MCMC(BOModel):
 
 
 
-    
