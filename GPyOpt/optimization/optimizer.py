@@ -62,6 +62,48 @@ class Opt_lbfgs(Optimizer):
             res = scipy.optimize.fmin_l_bfgs_b(f, x0=x0, bounds=self.space.get_bounds(),approx_grad=True, maxiter=self.maxiter)
         else:
             res = scipy.optimize.fmin_l_bfgs_b(_f_df, x0=x0, bounds=self.space.get_bounds(), maxiter=self.maxiter)
+
+            ##################
+            # DERIVATIVE CHECK
+            ##################
+            import numdifftools as nd
+            import pdb
+
+            def random_sample(bounds):
+                # k: Number of points
+                n = bounds.shape[0]  # Dimensionality of each point
+                X = np.zeros((1, n))
+                for i in range(0, n):
+                    X[:, i] = np.random.uniform(bounds[i, 0], bounds[i, 1])
+
+                return X
+
+            # Dimensionality
+            n = x0.shape[0]
+            # Number of testing points
+            N = 1000
+            der_num_lib = np.zeros((N, n))
+            der_an = np.zeros((N, n))
+            x_tests = []
+
+            for i in range(N):
+                x = random_sample(np.asarray(self.space.get_bounds()))
+                x_tests.append(x)
+
+                df = nd.Gradient(f)
+                der_num_lib[i] = df(x)
+                der_an[i] = f_df(x)[1][0]
+
+            error = np.linalg.norm((der_an - der_num_lib)/der_an, axis=1)
+            for i in range(N):
+                print('Analytical derivative:', der_an[i])
+                print('Numerical derivative:', der_num_lib[i])
+                print('Location x:', x_tests[i])
+                if error[i] > 0.01:
+                    pdb.set_trace()
+
+            print('Mean error:', mean(error))
+
         return np.atleast_2d(res[0]),np.atleast_2d(res[1])
 
 
