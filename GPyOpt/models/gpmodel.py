@@ -39,10 +39,6 @@ class GPModel(BOModel):
         self.sparse = sparse
         self.num_inducing = num_inducing
         self.model = None
-        if mean_function is None:
-            mean_function = GPy.core.Mapping(1, 1)
-            mean_function.f = lambda x: 0
-            mean_function.update_gradients = lambda a, b: None
         self.mean_function = mean_function
         
     @staticmethod
