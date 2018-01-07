@@ -63,6 +63,14 @@ class Opt_lbfgs(Optimizer):
             res = scipy.optimize.fmin_l_bfgs_b(f, x0=x0, bounds=self.space.get_bounds(),approx_grad=True, maxiter=self.maxiter)
         else:
             res = scipy.optimize.fmin_l_bfgs_b(_f_df, x0=x0, bounds=self.space.get_bounds(), maxiter=self.maxiter)
+
+        if res[2]['task'] == b'ABNORMAL_TERMINATION_IN_LNSRCH':
+            result_x = np.atleast_2d(x0)
+            result_fx = np.atleast_2d(f(x0))
+        else:
+            result_x = np.atleast_2d(res[0])
+            result_fx = np.atleast_2d(res[1])
+
         ###################
         ## DERIVATIVE CHECK
         ###################
@@ -104,8 +112,7 @@ class Opt_lbfgs(Optimizer):
         # if d['warnflag'] is not 0:
         #     pdb.set_trace()
 
-        return np.atleast_2d(res[0]),np.atleast_2d(res[1])
-
+        return result_x, result_fx
 
 
 class Opt_DIRECT(Optimizer):
