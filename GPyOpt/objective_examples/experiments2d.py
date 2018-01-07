@@ -149,8 +149,8 @@ class cosines(function2d):
         self.input_dim = 2
         if bounds == None: self.bounds = [(0,1),(0,1)]
         else: self.bounds = bounds
-        self.min = [(0.31426205,  0.30249864)]
-        self.fmin = -1.59622468
+        self.min = [(.5/1.6,  .5/1.6)]
+        self.fmin = -1.6
         if sd==None: self.sd = 0
         else: self.sd=sd
         self.name = 'Cosines'
