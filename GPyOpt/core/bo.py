@@ -82,9 +82,15 @@ class BO(object):
             
         # --- Initial function evaluation and model fitting
         if self.X is not None and self.Y is None:
-            self.Y, cost_values = self.objective.evaluate(self.X)
-            if self.cost.cost_type == 'evaluation_time':
-                self.cost.update_cost_model(self.X, cost_values)
+            ret = self.objective.func(self.X)
+            # We treat discrete inputs as continuous. The BO suggests continuous inputs
+            # that are discretized by the black box. The black box then also returns the real
+            # discretized applied input, if the discretization happened. Otherwise only Y is returned.
+            if isinstance(ret, tuple):
+                self.Y, self.X = ret
+            else:
+                self.Y = ret
+            assert self.Y.shape[0] == self.X.shape[0]
         
         # --- Initialize iterations and running time
         self.time_zero = time.time()
@@ -110,15 +116,24 @@ class BO(object):
             if not ((self.num_acquisitions < self.max_iter)): # and (self._distance_last_evaluations() > self.eps)):
                 break
 
-            # --- Augment X
-            self.X = np.vstack((self.X,self.suggested_sample))
-            
-            # --- Evaluate *f* in X, augment Y and update cost function (if needed)
-            self.evaluate_objective()
+            # Evaluate *f* in X and update X
+            ret = self.objective.func(self.suggested_sample)
+            # We treat discrete inputs as continuous. The BO suggests continuous inputs
+            # that are discretized by the black box. The black box then also returns the real
+            # discretized applied input, if the discretization happened. Otherwise only Y is returned.
+            if isinstance(ret, tuple):
+                Y, self.suggested_sample = ret
+            else:
+                Y = ret
 
+            self.Y = np.vstack((self.Y, Y))
+            # --- Augment X
+            self.X = np.vstack((self.X, self.suggested_sample))
+            
             # --- Update current evaluation time and function evaluations
             self.cum_time = time.time() - self.time_zero  
             self.num_acquisitions += 1
+            assert self.Y.shape[0] == self.X.shape[0]
                 
    
         # --- Stop messages and execution time   
